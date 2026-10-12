@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Literal, Self
 from urllib.parse import urlsplit
+from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import Field, SecretStr, field_validator, model_validator
@@ -21,10 +23,16 @@ class CollectorSettings(BaseSettings):
     environment: Literal["Production", "Development"] = "Production"
     api_base_url: str
     collector_api_key: SecretStr = Field(repr=False)
-    sync_interval_seconds: int = Field(default=300, ge=60, le=3600)
+    sync_interval_seconds: int = Field(default=21600, ge=60, le=86400)
     http_timeout_seconds: float = Field(default=15, ge=1, le=120)
     max_retry_attempts: int = Field(default=3, ge=0, le=10)
     time_zone: str = "Europe/Istanbul"
+    kurspro_enabled: bool = False
+    kurspro_base_url: str = "https://kurspro.net"
+    kurspro_student_id: UUID | None = None
+    kurspro_profile_directory: Path | None = None
+    kurspro_time_zone: str = "Europe/Istanbul"
+    kurspro_weekly_program_path: str = "/o/index.php?a=4"
 
     @field_validator("environment", mode="before")
     @classmethod
@@ -85,4 +93,39 @@ class CollectorSettings(BaseSettings):
                 )
 
         self.api_base_url = candidate
+
+        kurspro = self.kurspro_base_url.strip().rstrip("/")
+        parsed_kurspro = urlsplit(kurspro)
+        if (
+            parsed_kurspro.scheme != "https"
+            or parsed_kurspro.hostname != "kurspro.net"
+            or parsed_kurspro.port is not None
+            or parsed_kurspro.username is not None
+            or parsed_kurspro.password is not None
+            or parsed_kurspro.path not in {"", "/"}
+            or parsed_kurspro.query
+            or parsed_kurspro.fragment
+        ):
+            raise ValueError("Kurspro base URL must be exactly https://kurspro.net")
+        if self.kurspro_time_zone != "Europe/Istanbul":
+            raise ValueError("Kurspro time zone must be Europe/Istanbul")
+        if self.kurspro_weekly_program_path != "/o/index.php?a=4":
+            raise ValueError("Kurspro weekly program path is not supported")
+
+        if self.kurspro_enabled:
+            if self.kurspro_student_id is None or self.kurspro_student_id.int == 0:
+                raise ValueError(
+                    "Kurspro student ID is required when the connector is enabled"
+                )
+            if self.kurspro_profile_directory is None:
+                raise ValueError(
+                    "Kurspro profile directory is required when the connector is enabled"
+                )
+            profile = self.kurspro_profile_directory.expanduser().resolve()
+            repository_root = Path(__file__).resolve().parents[4]
+            if profile == repository_root or repository_root in profile.parents:
+                raise ValueError("Kurspro browser profile must be outside the repository")
+            self.kurspro_profile_directory = profile
+
+        self.kurspro_base_url = kurspro
         return self

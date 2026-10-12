@@ -50,6 +50,8 @@ venv/
 .mypy_cache/
 .ruff_cache/
 *.egg-info/
+playwright-profile/
+.browser-profile/
 
 # OS/editor
 .DS_Store

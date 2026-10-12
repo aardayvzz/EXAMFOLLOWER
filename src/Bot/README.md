@@ -1,8 +1,8 @@
 # ExamFollower Collector Bot
 
-This package is the secure, asynchronous foundation for collecting Zoom lesson records and
-submitting them to the ExamFollower backend. It intentionally contains no Kurspro or email
-connector yet and does not perform browser or email automation.
+This package collects approved lesson data and submits it to the ExamFollower backend. The
+Kurspro connector reads only the weekly program through a user-controlled persistent browser
+profile. It never accepts credentials, solves CAPTCHA, exports cookies, or automates login.
 
 ## Setup
 
@@ -27,8 +27,11 @@ Run one cycle or start the sequential service loop:
 .\.venv\Scripts\python -m examfollower_collector --service
 ```
 
-No sources are registered in this foundation, so either mode performs no network request until a
-future source implementation supplies validated lessons.
+Before the first Kurspro sync, configure a browser profile directory outside this repository and
+run `python -m examfollower_collector kurspro-login`. Complete login and CAPTCHA yourself, then
+navigate to the weekly-program page. A normal collector cycle reuses that local profile. If the
+session expires, the collector reports `ManualLoginRequired` and does not attempt an automatic
+login or retry within that cycle.
 
 ## Quality checks
 
@@ -40,7 +43,8 @@ future source implementation supplies validated lessons.
 
 ## Backend contract
 
-The client sends an authenticated `POST` to `/api/collector/zoom-lessons/upsert`. The API key is
-provided only in the `X-Collector-Api-Key` header. Request JSON uses the exact backend camel-case
+The client sends collector-key authenticated requests to the Zoom upsert endpoint and to
+`POST /api/collector/recurring-lessons/snapshot`. The API key is provided only in the
+`X-Collector-Api-Key` header. Zoom request JSON uses the exact backend camel-case
 fields `studentId`, `title`, `startAtUtc`, `endAtUtc`, `joinUrl`, `source`, `externalId`, and
 `lockRequired`. Timestamps are converted to UTC and serialized with a `Z` suffix.

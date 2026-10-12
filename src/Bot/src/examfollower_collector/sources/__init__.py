@@ -11,3 +11,9 @@ __all__ = [
     "SourceError",
     "TemporarySourceError",
 ]
+from examfollower_collector.sources.kurspro import (
+    KursproWeeklyScheduleSource,
+    ManualLoginRequired,
+)
+
+__all__ = ["KursproWeeklyScheduleSource", "ManualLoginRequired"]
