@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{FE360695-3F2B-1049-3887-35FBB5135923}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LgsTakip.Api", "src\Backend\LgsTakip.Api\LgsTakip.Api.csproj", "{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{C62EED4C-2AC9-F50F-E0BC-649CFEA98BDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LgsTakip.Api.IntegrationTests", "tests\Backend\LgsTakip.Api.IntegrationTests\LgsTakip.Api.IntegrationTests.csproj", "{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Debug|x64.Build.0 = Debug|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Debug|x86.Build.0 = Debug|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Release|x64.ActiveCfg = Release|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Release|x64.Build.0 = Release|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Release|x86.ActiveCfg = Release|Any CPU
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD}.Release|x86.Build.0 = Release|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Debug|x64.Build.0 = Debug|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Debug|x86.Build.0 = Debug|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Release|x64.ActiveCfg = Release|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Release|x64.Build.0 = Release|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Release|x86.ActiveCfg = Release|Any CPU
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FE360695-3F2B-1049-3887-35FBB5135923} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{3DD56EC6-176E-49A6-8AE3-93179A56E1FD} = {FE360695-3F2B-1049-3887-35FBB5135923}
+		{C62EED4C-2AC9-F50F-E0BC-649CFEA98BDB} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{61A38C9D-D90E-4DC4-BDDE-02C1F5F698D1} = {C62EED4C-2AC9-F50F-E0BC-649CFEA98BDB}
+	EndGlobalSection
+EndGlobal
