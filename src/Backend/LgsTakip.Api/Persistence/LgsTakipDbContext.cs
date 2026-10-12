@@ -13,6 +13,8 @@ public class LgsTakipDbContext(DbContextOptions<LgsTakipDbContext> options)
     public DbSet<ExamResult> ExamResults => Set<ExamResult>();
     public DbSet<ParentStudentInvitation> ParentStudentInvitations =>
         Set<ParentStudentInvitation>();
+    public DbSet<RecurringLessonSchedule> RecurringLessonSchedules =>
+        Set<RecurringLessonSchedule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -205,6 +207,54 @@ public class LgsTakipDbContext(DbContextOptions<LgsTakipDbContext> options)
             entity.HasOne(result => result.Student)
                 .WithMany(user => user.ExamResults)
                 .HasForeignKey(result => result.StudentId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RecurringLessonSchedule>(entity =>
+        {
+            entity.ToTable("RecurringLessonSchedules", table =>
+            {
+                table.HasCheckConstraint(
+                    "CK_RecurringLessonSchedules_IsoDayOfWeek",
+                    "[IsoDayOfWeek] BETWEEN 1 AND 7");
+                table.HasCheckConstraint(
+                    "CK_RecurringLessonSchedules_LocalTimeRange",
+                    "[StartLocalTime] < [EndLocalTime]");
+                table.HasCheckConstraint(
+                    "CK_RecurringLessonSchedules_MaximumDuration",
+                    "DATEDIFF(SECOND, [StartLocalTime], [EndLocalTime]) <= 28800");
+                table.HasCheckConstraint(
+                    "CK_RecurringLessonSchedules_ReminderMinutesBefore",
+                    "[ReminderMinutesBefore] IN (0, 5, 10, 15, 30, 60)");
+            });
+
+            entity.HasKey(schedule => schedule.Id);
+            entity.Property(schedule => schedule.Title).HasMaxLength(200).IsRequired();
+            entity.Property(schedule => schedule.StartLocalTime).HasColumnType("time(0)");
+            entity.Property(schedule => schedule.EndLocalTime).HasColumnType("time(0)");
+            entity.Property(schedule => schedule.TimeZoneId).HasMaxLength(100).IsRequired();
+            entity.Property(schedule => schedule.Source).HasMaxLength(50).IsRequired();
+            entity.Property(schedule => schedule.ExternalId).HasMaxLength(200).IsRequired();
+
+            entity.HasIndex(schedule => new
+                {
+                    schedule.StudentId,
+                    schedule.Source,
+                    schedule.ExternalId
+                },
+                "UX_RecurringLessonSchedules_StudentId_Source_ExternalId")
+                .IsUnique();
+            entity.HasIndex(schedule => new
+                {
+                    schedule.StudentId,
+                    schedule.IsActive,
+                    schedule.IsoDayOfWeek
+                });
+
+            entity.HasOne(schedule => schedule.Student)
+                .WithMany(user => user.RecurringLessonSchedules)
+                .HasForeignKey(schedule => schedule.StudentId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
         });

@@ -125,6 +125,84 @@ namespace LgsTakip.Api.Persistence.Migrations
                     b.ToTable("ParentStudentInvitations", (string)null);
                 });
 
+            modelBuilder.Entity("LgsTakip.Api.Domain.Entities.RecurringLessonSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<TimeOnly>("EndLocalTime")
+                        .HasColumnType("time(0)");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("IsoDayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("LastSeenAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("LockRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("NotificationEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ReminderMinutesBefore")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<TimeOnly>("StartLocalTime")
+                        .HasColumnType("time(0)");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TimeZoneId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId", "IsActive", "IsoDayOfWeek");
+
+                    b.HasIndex(new[] { "StudentId", "Source", "ExternalId" }, "UX_RecurringLessonSchedules_StudentId_Source_ExternalId")
+                        .IsUnique();
+
+                    b.ToTable("RecurringLessonSchedules", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RecurringLessonSchedules_IsoDayOfWeek", "[IsoDayOfWeek] BETWEEN 1 AND 7");
+
+                            t.HasCheckConstraint("CK_RecurringLessonSchedules_LocalTimeRange", "[StartLocalTime] < [EndLocalTime]");
+
+                            t.HasCheckConstraint("CK_RecurringLessonSchedules_MaximumDuration", "DATEDIFF(SECOND, [StartLocalTime], [EndLocalTime]) <= 28800");
+
+                            t.HasCheckConstraint("CK_RecurringLessonSchedules_ReminderMinutesBefore", "[ReminderMinutesBefore] IN (0, 5, 10, 15, 30, 60)");
+                        });
+                });
+
             modelBuilder.Entity("LgsTakip.Api.Domain.Entities.StudySession", b =>
                 {
                     b.Property<Guid>("Id")
@@ -313,6 +391,17 @@ namespace LgsTakip.Api.Persistence.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("LgsTakip.Api.Domain.Entities.RecurringLessonSchedule", b =>
+                {
+                    b.HasOne("LgsTakip.Api.Domain.Entities.User", "Student")
+                        .WithMany("RecurringLessonSchedules")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("LgsTakip.Api.Domain.Entities.StudySession", b =>
                 {
                     b.HasOne("LgsTakip.Api.Domain.Entities.User", "Student")
@@ -353,6 +442,8 @@ namespace LgsTakip.Api.Persistence.Migrations
             modelBuilder.Entity("LgsTakip.Api.Domain.Entities.User", b =>
                 {
                     b.Navigation("ExamResults");
+
+                    b.Navigation("RecurringLessonSchedules");
 
                     b.Navigation("StudySessions");
 

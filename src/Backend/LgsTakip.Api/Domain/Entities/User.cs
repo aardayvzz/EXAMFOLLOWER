@@ -18,4 +18,5 @@ public class User
     public ICollection<StudySession> StudySessions { get; set; } = [];
     public ICollection<ZoomLesson> ZoomLessons { get; set; } = [];
     public ICollection<ExamResult> ExamResults { get; set; } = [];
+    public ICollection<RecurringLessonSchedule> RecurringLessonSchedules { get; set; } = [];
 }

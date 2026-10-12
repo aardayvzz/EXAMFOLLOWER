@@ -11,6 +11,8 @@ using LgsTakip.Api.Application.ParentAnalytics.Interfaces;
 using LgsTakip.Api.Application.ParentAnalytics.Services;
 using LgsTakip.Api.Application.ParentLinking.Interfaces;
 using LgsTakip.Api.Application.ParentLinking.Services;
+using LgsTakip.Api.Application.RecurringLessons.Interfaces;
+using LgsTakip.Api.Application.RecurringLessons.Services;
 using LgsTakip.Api.Application.StudySessions.Interfaces;
 using LgsTakip.Api.Application.StudySessions.Services;
 using LgsTakip.Api.Application.ZoomLessons.Interfaces;
@@ -208,6 +210,7 @@ builder.Services.AddScoped<IParentAnalyticsService, ParentAnalyticsService>();
 builder.Services.AddScoped<IParentLinkService, ParentLinkService>();
 builder.Services.AddScoped<IExamResultService, ExamResultService>();
 builder.Services.AddScoped<IZoomLessonService, ZoomLessonService>();
+builder.Services.AddScoped<IRecurringLessonService, RecurringLessonService>();
 
 static string GetAuthenticatedUserPartition(HttpContext httpContext)
 {
