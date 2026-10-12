@@ -13,9 +13,12 @@ using LgsTakip.Api.Application.ParentLinking.Interfaces;
 using LgsTakip.Api.Application.ParentLinking.Services;
 using LgsTakip.Api.Application.StudySessions.Interfaces;
 using LgsTakip.Api.Application.StudySessions.Services;
+using LgsTakip.Api.Application.ZoomLessons.Interfaces;
+using LgsTakip.Api.Application.ZoomLessons.Services;
 using LgsTakip.Api.Domain.Entities;
 using LgsTakip.Api.Domain.Enums;
 using LgsTakip.Api.Infrastructure.Authentication;
+using LgsTakip.Api.Infrastructure.CollectorAuthentication;
 using LgsTakip.Api.Infrastructure.ParentLinking;
 using LgsTakip.Api.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,6 +46,8 @@ builder.Services
             new JsonStringEnumConverter(allowIntegerValues: false)));
 
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
+var collectorSection = builder.Configuration.GetSection(
+    CollectorAuthenticationOptions.SectionName);
 
 builder.Services
     .AddOptions<JwtOptions>()
@@ -68,7 +73,25 @@ builder.Services
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer();
+    .AddJwtBearer()
+    .AddScheme<
+        CollectorAuthenticationOptions,
+        CollectorApiKeyAuthenticationHandler>(
+            CollectorAuthenticationDefaults.Scheme,
+            _ => { });
+
+builder.Services
+    .AddOptions<CollectorAuthenticationOptions>(
+        CollectorAuthenticationDefaults.Scheme)
+    .Bind(collectorSection)
+    .Validate(
+        options => !string.IsNullOrWhiteSpace(options.ApiKeyHeaderName),
+        "Collector API key header name must be configured at 'CollectorAuthentication:ApiKeyHeaderName'.")
+    .Validate(
+        options => !string.IsNullOrEmpty(options.ApiKey)
+            && Encoding.UTF8.GetByteCount(options.ApiKey) >= 32,
+        "Collector API key must be configured at 'CollectorAuthentication:ApiKey' and contain at least 32 bytes.")
+    .ValidateOnStart();
 
 builder.Services
     .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
@@ -98,9 +121,20 @@ builder.Services
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("StudentOnly", policy =>
-        policy.RequireRole(UserRole.Student.ToString()));
+        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+            .RequireRole(UserRole.Student.ToString()));
     options.AddPolicy("ParentOnly", policy =>
-        policy.RequireRole(UserRole.Parent.ToString()));
+        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+            .RequireRole(UserRole.Parent.ToString()));
+    options.AddPolicy(
+        CollectorAuthenticationDefaults.Policy,
+        policy => policy
+            .AddAuthenticationSchemes(
+                CollectorAuthenticationDefaults.Scheme)
+            .RequireAuthenticatedUser()
+            .RequireClaim(
+                CollectorAuthenticationDefaults.ClaimType,
+                CollectorAuthenticationDefaults.ClaimValue));
 });
 
 builder.Services
@@ -150,6 +184,19 @@ builder.Services.AddRateLimiter(options =>
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 AutoReplenishment = true
             }));
+
+    options.AddPolicy("CollectorIngestion", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString()
+                ?? "unknown-collector-client",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                AutoReplenishment = true
+            }));
 });
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -160,6 +207,7 @@ builder.Services.AddScoped<IStudySessionService, StudySessionService>();
 builder.Services.AddScoped<IParentAnalyticsService, ParentAnalyticsService>();
 builder.Services.AddScoped<IParentLinkService, ParentLinkService>();
 builder.Services.AddScoped<IExamResultService, ExamResultService>();
+builder.Services.AddScoped<IZoomLessonService, ZoomLessonService>();
 
 static string GetAuthenticatedUserPartition(HttpContext httpContext)
 {

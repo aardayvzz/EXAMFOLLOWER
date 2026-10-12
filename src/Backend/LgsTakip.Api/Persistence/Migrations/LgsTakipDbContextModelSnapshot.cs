@@ -260,9 +260,9 @@ namespace LgsTakip.Api.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex(new[] { "StudentId", "StartAtUtc" }, "IX_ZoomLessons_StudentId_StartAtUtc");
 
-                    b.HasIndex("Source", "ExternalId")
+                    b.HasIndex(new[] { "StudentId", "Source", "ExternalId" }, "UX_ZoomLessons_StudentId_Source_ExternalId")
                         .IsUnique()
                         .HasFilter("[ExternalId] IS NOT NULL");
 

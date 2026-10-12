@@ -144,9 +144,22 @@ public class LgsTakipDbContext(DbContextOptions<LgsTakipDbContext> options)
             entity.Property(lesson => lesson.ExternalId)
                 .HasMaxLength(256);
 
-            entity.HasIndex(lesson => new { lesson.Source, lesson.ExternalId })
+            entity.HasIndex(lesson => new
+                {
+                    lesson.StudentId,
+                    lesson.Source,
+                    lesson.ExternalId
+                },
+                "UX_ZoomLessons_StudentId_Source_ExternalId")
                 .IsUnique()
                 .HasFilter("[ExternalId] IS NOT NULL");
+
+            entity.HasIndex(lesson => new
+                {
+                    lesson.StudentId,
+                    lesson.StartAtUtc
+                },
+                "IX_ZoomLessons_StudentId_StartAtUtc");
 
             entity.HasOne(lesson => lesson.Student)
                 .WithMany(user => user.ZoomLessons)

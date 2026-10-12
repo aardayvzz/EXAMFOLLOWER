@@ -25,6 +25,8 @@ public sealed class SqlServerWebApplicationFactory : WebApplicationFactory<Progr
 
     private readonly string _signingKey = Convert.ToBase64String(
         RandomNumberGenerator.GetBytes(48));
+    private readonly string _collectorApiKey = Convert.ToBase64String(
+        RandomNumberGenerator.GetBytes(48));
     private readonly string _connectionString;
     private readonly TimeProvider? _timeProvider;
     private readonly ConcurrentQueue<string>? _logMessages;
@@ -47,6 +49,7 @@ public sealed class SqlServerWebApplicationFactory : WebApplicationFactory<Progr
     }
 
     public string DatabaseName { get; }
+    public string CollectorApiKey => _collectorApiKey;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -60,6 +63,9 @@ public sealed class SqlServerWebApplicationFactory : WebApplicationFactory<Progr
                 ["Jwt:Audience"] = ExpectedAudience,
                 ["Jwt:SigningKey"] = _signingKey,
                 ["Jwt:AccessTokenExpirationMinutes"] = "60",
+                ["CollectorAuthentication:ApiKeyHeaderName"] =
+                    "X-Collector-Api-Key",
+                ["CollectorAuthentication:ApiKey"] = _collectorApiKey,
                 ["Logging:LogLevel:Default"] = "Warning"
             });
         });
