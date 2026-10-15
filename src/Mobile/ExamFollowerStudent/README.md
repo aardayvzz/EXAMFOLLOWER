@@ -76,6 +76,8 @@ cd android
 
 ## Fiziksel tablet kontrol listesi
 
+15 Ekim 2026 bağlantı kontrolünde cihaz bulunamadı; fiziksel doğrulama bekliyor. Ayrıntılı test durumu, bağlantı checkpoint'i ve sonraki aşamanın teknik sınırları [Android kilit tasarımı raporunda](../../../docs/mobile/android-lock-task-design.md) kayıtlıdır.
+
 1. Bilgisayar ve tableti aynı ağa bağlayıp `EXAM_FOLLOWER_API_URL` değerini bilgisayarın LAN IP'siyle verin.
 2. Student hesabıyla giriş yapın; Android 13+ bildirim açıklamasından izni verin.
 3. Yakın gelecekte başlayan test dersini senkronize edip bildirimin ders saatinde geldiğini doğrulayın.
